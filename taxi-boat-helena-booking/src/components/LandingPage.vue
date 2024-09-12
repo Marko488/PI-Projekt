@@ -5,7 +5,8 @@
         <img src="@/assets/logo.png" alt="Taxi Boat Helena Logo" />
       </div>
       <div class="heading">
-        <h2>Best Taxi Boat in all Croatia</h2>
+        <h1>Taxi Boat Helena Booking</h1>
+        <h3>Best Taxi Boat in all Croatia</h3>
         <p>Fast and safe taxi services</p>
       </div>
       <div class="register-login">
@@ -44,6 +45,7 @@ export default {
 
 .content {
   background-color: rgba(255, 255, 255, 0.8);
+  width: 20rem;
   padding: 20px;
   border-radius: 10px;
   text-align: center;
@@ -84,5 +86,15 @@ export default {
 .register-login p {
   margin: 10px 0;
   color: #333;
+}
+@media (max-width: 768px) {
+  .heading h2 {
+    font-size: 18px;
+  }
+
+  .register-login button {
+    font-size: 14px;
+    padding: 8px;
+  }
 }
 </style>
