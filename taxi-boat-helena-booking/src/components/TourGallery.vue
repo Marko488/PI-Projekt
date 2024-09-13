@@ -10,8 +10,10 @@
       </div>
 
       <!-- Next/Previous Buttons -->
-      <button class="nav-btn prev" @click="prevImage">&#9664;</button>
-      <button class="nav-btn next" @click="nextImage">&#9654;</button>
+      <div class="nav-controls">
+        <button class="nav-btn prev" @click="prevImage">&#9664;</button>
+        <button class="nav-btn next" @click="nextImage">&#9654;</button>
+      </div>
     </div>
 
     <!-- Display current slide info -->
@@ -73,65 +75,78 @@ export default {
 </script>
 
 <style scoped>
+/* Ensure full-screen layout without scrolling */
 .gallery-page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
+  justify-content: flex-start;
+  height: 100vh;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .carousel {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  max-width: 500px;
-  text-align: center;
+  height: 70vh;
+  max-width: 1000px;
 }
 
 .image-container {
+  width: 100%;
+  height: 65vh;
   position: relative;
 }
 
 .image-container img {
   width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 10px;
+  height: 100%;
+  object-fit: cover;
 }
 
 .image-title {
   position: absolute;
-  bottom: 10px;
+  bottom: 20px;
   left: 0;
   right: 0;
   text-align: center;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
-  padding: 5px;
+  padding: 10px;
+}
+
+.nav-controls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 20px;
+  margin-top: 10px;
 }
 
 .nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #0066cc;
   color: white;
   border: none;
-  padding: 10px;
+  padding: 10px 20px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.prev {
-  left: 10px;
+.nav-btn:hover {
+  background-color: #004c99;
 }
 
-.next {
-  right: 10px;
+p {
+  font-size: 16px;
+  margin-top: 10px;
 }
 
 .back-btn {
-  margin-top: 20px;
   padding: 10px 20px;
+  margin-top: 15px;
   background-color: #0066cc;
   color: white;
   border: none;
@@ -141,10 +156,5 @@ export default {
 
 .back-btn:hover {
   background-color: #004c99;
-}
-
-p {
-  margin-top: 10px;
-  font-size: 14px;
 }
 </style>
