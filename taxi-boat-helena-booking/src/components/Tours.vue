@@ -1,9 +1,14 @@
 <template>
   <div class="tours-page">
-    <h1>TOURS</h1>
+    <h1>{{ pageTitle }}</h1>
+
+    <!-- "See all tours instead" button, only shown when viewing new tours -->
+    <button v-if="showAllToursButton" @click="showAllTours">
+      See all tours instead
+    </button>
     <div class="tours-container">
       <div
-        v-for="tour in tours"
+        v-for="tour in filteredTours"
         :key="tour.id"
         class="tour-card"
         @click="viewTourDetails(tour.id)"
@@ -29,14 +34,34 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase"; // Firestore instance
 
 export default {
-  name: "Tours",
   data() {
     return {
       tours: [],
+      showAllToursButton: false,
+      pageTitle: "Tours", // Default title
     };
+  },
+  computed: {
+    filteredTours() {
+      // Check if the query parameter 'new' is present
+      if (this.$route.query.new === "true") {
+        // Show only new tours if 'new' query parameter is true
+        return this.tours.filter((tour) => tour.newTour === true);
+      }
+      return this.tours; // Otherwise, show all tours
+    },
   },
   mounted() {
     this.fetchTours();
+  },
+  watch: {
+    // Watch for changes in the route query to dynamically update the page
+    "$route.query": {
+      immediate: true,
+      handler() {
+        this.updatePageContent();
+      },
+    },
   },
   methods: {
     async fetchTours() {
@@ -45,13 +70,30 @@ export default {
         id: doc.id,
         ...doc.data(),
       }));
+
+      // After fetching tours, update the content based on the route query
+      this.updatePageContent();
+    },
+    updatePageContent() {
+      // Check if we are showing new tours and adjust the title and button visibility
+      if (this.$route.query.new === "true") {
+        this.pageTitle = "New Tours";
+        this.showAllToursButton = true;
+      } else {
+        this.pageTitle = "Tours"; // Default title
+        this.showAllToursButton = false;
+      }
+    },
+    viewTourDetails(id) {
+      this.$router.push(`/tours/${id}`); // Navigate to the Tour Details page with the tour ID
+    },
+    showAllTours() {
+      // Navigate to the tours page without the "new" query to show all tours
+      this.$router.push({ path: "/tours" });
     },
     formatDate(dateStr) {
       const [day, month, year] = dateStr.split(".");
       return `${day}.${month}.${year}`;
-    },
-    viewTourDetails(id) {
-      this.$router.push(`/tours/${id}`); // Navigate to the Tour Details page with the tour ID
     },
   },
 };

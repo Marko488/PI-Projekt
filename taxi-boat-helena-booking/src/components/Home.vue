@@ -42,8 +42,7 @@ export default {
       alert("Finding the ideal tour...");
     },
     newTours() {
-      // Handle the "Pregledaj naše najnovije ture" button click
-      alert("Checking the newest tours...");
+      this.$router.push({ path: "/tours", query: { new: "true" } }); // Navigate to Tours with "new" query
     },
   },
 };
