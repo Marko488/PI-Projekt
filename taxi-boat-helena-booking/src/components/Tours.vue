@@ -2,7 +2,12 @@
   <div class="tours-page">
     <h1>TOURS</h1>
     <div class="tours-container">
-      <div v-for="tour in tours" :key="tour.id" class="tour-card">
+      <div
+        v-for="tour in tours"
+        :key="tour.id"
+        class="tour-card"
+        @click="viewTourDetails(tour.id)"
+      >
         <div class="tour-image">
           <img :src="tour.images[0].imageUrl" :alt="tour.title" />
           <div class="date-badge">
@@ -30,6 +35,9 @@ export default {
       tours: [],
     };
   },
+  mounted() {
+    this.fetchTours();
+  },
   methods: {
     async fetchTours() {
       const querySnapshot = await getDocs(collection(db, "tours"));
@@ -42,9 +50,9 @@ export default {
       const [day, month, year] = dateStr.split(".");
       return `${day}.${month}.${year}`;
     },
-  },
-  mounted() {
-    this.fetchTours();
+    viewTourDetails(id) {
+      this.$router.push(`/tours/${id}`); // Navigate to the Tour Details page with the tour ID
+    },
   },
 };
 </script>
