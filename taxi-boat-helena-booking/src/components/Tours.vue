@@ -93,7 +93,15 @@ export default {
   },
   computed: {
     filteredTours() {
+      const currentDate = new Date();
+
       let filtered = this.tours;
+
+      // Filter out tours that have an endDate in the past
+      filtered = filtered.filter((tour) => {
+        const endDate = new Date(tour.endDate.split(".").reverse().join("-"));
+        return endDate >= currentDate; // Only show tours that are ongoing or in the future
+      });
 
       // Filter by new tours if the "new" query parameter is present
       if (this.$route.query.new === "true") {
