@@ -48,6 +48,7 @@
 <script>
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase"; // Import Firebase config
+import router from "../router";
 
 export default {
   data() {
@@ -67,7 +68,7 @@ export default {
       try {
         await createUserWithEmailAndPassword(auth, this.email, this.password);
         alert("Račun kreiran uspješno!");
-        // Redirect or do something after registration
+        router.push("/home");
       } catch (error) {
         alert(error.message);
       }

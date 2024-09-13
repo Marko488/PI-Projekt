@@ -32,6 +32,7 @@
 <script>
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase"; // Import Firebase config
+import router from "../router";
 
 export default {
   data() {
@@ -45,7 +46,7 @@ export default {
       try {
         await signInWithEmailAndPassword(auth, this.email, this.password);
         alert("Prijava uspješna!");
-        // Redirect or do something after login
+        router.push("/home");
       } catch (error) {
         alert(error.message);
       }
