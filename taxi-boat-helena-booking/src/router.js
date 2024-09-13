@@ -10,6 +10,7 @@ import ContactInformation from "@/components/ContactInformation.vue";
 import Payments from "@/components/Payments.vue";
 import TourDetails from "@/components/TourDetails.vue";
 import TourGallery from "@/components/TourGallery.vue";
+import TourReviews from "@/components/TourReviews.vue";
 
 const routes = [
   { path: "/", redirect: "/start" },
@@ -24,6 +25,7 @@ const routes = [
   { path: "/payments", component: Payments },
   { path: "/tours/:id", component: TourDetails },
   { path: "/tours/:id/gallery", component: TourGallery },
+  { path: "/tours/:id/reviews", component: TourReviews },
 ];
 
 const router = createRouter({

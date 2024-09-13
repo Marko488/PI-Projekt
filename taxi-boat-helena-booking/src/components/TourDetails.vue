@@ -56,7 +56,7 @@
     <!-- Buttons -->
     <div class="buttons-section">
       <button class="btn-secondary" @click="viewGallery">View Gallery</button>
-      <button class="btn-secondary">View Reviews</button>
+      <button class="btn-secondary" @click="viewReviews">View Reviews</button>
     </div>
 
     <!-- Reserve Button -->
@@ -100,6 +100,9 @@ export default {
     },
     viewGallery() {
       this.$router.push(`/tours/${this.$route.params.id}/gallery`); // Navigate to the gallery
+    },
+    viewReviews() {
+      this.$router.push(`/tours/${this.$route.params.id}/reviews`); // Navigate to the reviews page
     },
   },
   mounted() {
