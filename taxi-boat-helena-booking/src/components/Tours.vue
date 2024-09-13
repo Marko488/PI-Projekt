@@ -215,6 +215,9 @@ export default {
 .tours-page {
   padding: 20px;
   text-align: center;
+  padding-bottom: 80px;
+  min-height: 100vh;
+  overflow-y: auto;
 }
 
 .tours-container {

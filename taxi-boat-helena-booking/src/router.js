@@ -11,6 +11,7 @@ import Payments from "@/components/Payments.vue";
 import TourDetails from "@/components/TourDetails.vue";
 import TourGallery from "@/components/TourGallery.vue";
 import TourReviews from "@/components/TourReviews.vue";
+import AddTour from "./components/AddTour.vue";
 
 const routes = [
   { path: "/", redirect: "/start" },
@@ -26,6 +27,11 @@ const routes = [
   { path: "/tours/:id", component: TourDetails },
   { path: "/tours/:id/gallery", component: TourGallery },
   { path: "/tours/:id/reviews", component: TourReviews },
+  {
+    path: "/add-tour",
+    component: AddTour,
+    meta: { requiresAdmin: true }, // Mark route as requiring admin access
+  },
 ];
 
 const router = createRouter({

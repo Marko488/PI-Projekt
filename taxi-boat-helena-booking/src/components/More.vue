@@ -4,13 +4,33 @@
       <div class="buttons">
         <button @click="navigateTo('contact')">Kontakt</button>
         <button @click="navigateTo('accounts')">Računi</button>
+        <div v-if="isAdmin">
+          <button @click="navigateToAddTour">Dodaj turu</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { getDoc, doc } from "firebase/firestore";
+import { db, auth } from "../../firebase"; // Firestore instance
+
 export default {
+  data() {
+    return {
+      isAdmin: false,
+    };
+  },
+  mounted() {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        await this.checkUserRole(user);
+      } else {
+        console.log("User is not logged in");
+      }
+    });
+  },
   name: "More",
   methods: {
     navigateTo(view) {
@@ -19,6 +39,25 @@ export default {
       } else if (view === "accounts") {
         this.$router.push("/payments"); // Placeholder for Accounts
       }
+    },
+    async checkUserRole() {
+      try {
+        const user = auth.currentUser; // Fetch the current authenticated user
+        if (user) {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists() && userDoc.data().role === "admin") {
+            this.isAdmin = true; // Set isAdmin to true if the user has the admin role
+          }
+        } else {
+          console.log("User is not logged in");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      }
+    },
+
+    navigateToAddTour() {
+      this.$router.push("/add-tour"); // Navigate to the tour addition form
     },
   },
 };

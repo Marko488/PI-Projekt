@@ -47,7 +47,8 @@
 
 <script>
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase"; // Import Firebase config
+import { setDoc, doc } from "firebase/firestore";
+import { auth, db } from "../../firebase"; // Import Firebase config
 import router from "../router";
 
 export default {
@@ -66,7 +67,22 @@ export default {
         return;
       }
       try {
-        await createUserWithEmailAndPassword(auth, this.email, this.password);
+        // Step 1: Create the user in Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          this.email,
+          this.password
+        );
+        const user = userCredential.user;
+
+        // Step 2: Store user information in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          name: this.name,
+          email: this.email,
+          role: "user", // Set default role as "user"
+        });
+
+        // Notify user and navigate to home
         alert("Račun kreiran uspješno!");
         router.push("/home");
       } catch (error) {
