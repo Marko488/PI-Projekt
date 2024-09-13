@@ -18,7 +18,7 @@
         <option
           v-for="duration in availableDurations"
           :key="duration"
-          :value="duration"
+          :value="duration.toString()"
         >
           {{ duration }} days
         </option>
@@ -102,13 +102,16 @@ export default {
 
       // Filter by duration
       if (this.selectedDuration) {
-        filtered = filtered.filter(
-          (tour) =>
-            this.calculateDuration(tour.startDate, tour.endDate) ===
-            parseInt(this.selectedDuration)
-        );
+        if (this.selectedDuration !== "") {
+          // Filter by the exact number of days
+          console.log(this.selectedDuration);
+          filtered = filtered.filter(
+            (tour) =>
+              this.calculateDuration(tour.startDate, tour.endDate) ===
+              parseInt(this.selectedDuration)
+          );
+        }
       }
-
       // Filter by from city
       if (this.selectedFromCity) {
         filtered = filtered.filter(
