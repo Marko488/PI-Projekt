@@ -17,7 +17,7 @@ export default {
       if (view === "contact") {
         this.$router.push("/contact"); // Navigate to Contact view
       } else if (view === "accounts") {
-        this.$router.push("/accounts"); // Placeholder for Accounts
+        this.$router.push("/payments"); // Placeholder for Accounts
       }
     },
   },
