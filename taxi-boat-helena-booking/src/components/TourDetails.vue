@@ -116,6 +116,7 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 20px;
+  padding-bottom: 80px;
 }
 
 .hero-section {
@@ -191,10 +192,13 @@ button {
 }
 
 .btn-primary {
+  padding: 10px 20px;
   background-color: #0066cc;
   color: white;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
+  width: 100%;
 }
 
 .btn-secondary {
