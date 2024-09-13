@@ -10,9 +10,13 @@
         <p>Fast and safe taxi services</p>
       </div>
       <div class="register-login">
-        <button @click="register">Registriraj se</button>
+        <router-link to="/register">
+          <button @click="register">Registriraj se</button>
+        </router-link>
         <p>Već imaš račun?</p>
-        <button @click="login">Prijava</button>
+        <router-link to="/login">
+          <button @click="login">Prijava</button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -21,14 +25,6 @@
 <script>
 export default {
   name: "LandingPage",
-  methods: {
-    register() {
-      // Logic for registration, route to register page or open modal
-    },
-    login() {
-      // Logic for login, route to login page or open modal
-    },
-  },
 };
 </script>
 
@@ -52,7 +48,7 @@ export default {
 }
 
 .logo img {
-  width: 100px;
+  width: 200px;
   margin-bottom: 20px;
 }
 
