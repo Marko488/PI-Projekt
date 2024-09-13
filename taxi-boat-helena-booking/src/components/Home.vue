@@ -38,8 +38,7 @@ export default {
   name: "Home",
   methods: {
     findTour() {
-      // Handle the "Nađi idealnu turu" button click
-      alert("Finding the ideal tour...");
+      this.$router.push({ path: "/tours", query: { findIdealTour: "true" } }); // Navigate with the query
     },
     newTours() {
       this.$router.push({ path: "/tours", query: { new: "true" } }); // Navigate to Tours with "new" query

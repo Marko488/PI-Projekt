@@ -6,6 +6,49 @@
     <button v-if="showAllToursButton" @click="showAllTours">
       See all tours instead
     </button>
+    <!-- "Nađi idealnu turu" Form, only shown when in filter mode (findIdealTour) -->
+    <div v-if="showFilterForm" class="filter-form">
+      <label for="duration">Choose Duration:</label>
+      <select
+        v-model="selectedDuration"
+        @change="filterTours"
+        class="form-select"
+      >
+        <option value="">Any Duration</option>
+        <option
+          v-for="duration in availableDurations"
+          :key="duration"
+          :value="duration"
+        >
+          {{ duration }} days
+        </option>
+      </select>
+
+      <label for="fromCity">From City:</label>
+      <select
+        v-model="selectedFromCity"
+        @change="filterTours"
+        class="form-select"
+      >
+        <option value="">Any City</option>
+        <option v-for="city in availableFromCities" :key="city" :value="city">
+          {{ city }}
+        </option>
+      </select>
+
+      <label for="toCity">To City:</label>
+      <select
+        v-model="selectedToCity"
+        @change="filterTours"
+        class="form-select"
+      >
+        <option value="">Any City</option>
+        <option v-for="city in availableToCities" :key="city" :value="city">
+          {{ city }}
+        </option>
+      </select>
+    </div>
+
     <div class="tours-container">
       <div
         v-for="tour in filteredTours"
@@ -39,16 +82,48 @@ export default {
       tours: [],
       showAllToursButton: false,
       pageTitle: "Tours", // Default title
+      showFilterForm: true,
+      selectedDuration: "", // Selected duration filter
+      selectedFromCity: "", // Selected from city filter
+      selectedToCity: "", // Selected to city filter
+      availableDurations: [], // Available durations extracted from tours
+      availableFromCities: [], // Available from cities extracted from tours
+      availableToCities: [], // Available to cities extracted from tours
     };
   },
   computed: {
     filteredTours() {
-      // Check if the query parameter 'new' is present
+      let filtered = this.tours;
+
+      // Filter by new tours if the "new" query parameter is present
       if (this.$route.query.new === "true") {
-        // Show only new tours if 'new' query parameter is true
-        return this.tours.filter((tour) => tour.newTour === true);
+        filtered = filtered.filter((tour) => tour.newTour === true);
       }
-      return this.tours; // Otherwise, show all tours
+
+      // Filter by duration
+      if (this.selectedDuration) {
+        filtered = filtered.filter(
+          (tour) =>
+            this.calculateDuration(tour.startDate, tour.endDate) ===
+            parseInt(this.selectedDuration)
+        );
+      }
+
+      // Filter by from city
+      if (this.selectedFromCity) {
+        filtered = filtered.filter(
+          (tour) => tour.city === this.selectedFromCity
+        );
+      }
+
+      // Filter by to city
+      if (this.selectedToCity) {
+        filtered = filtered.filter(
+          (tour) => tour.endCity === this.selectedToCity
+        ); // Assuming endCity exists in Firestore
+      }
+
+      return filtered;
     },
   },
   mounted() {
@@ -71,19 +146,56 @@ export default {
         ...doc.data(),
       }));
 
+      // Extract available durations, from cities, and to cities
+      this.extractFilters();
+
       // After fetching tours, update the content based on the route query
       this.updatePageContent();
     },
+    extractFilters() {
+      const durations = new Set();
+      const fromCities = new Set();
+      const toCities = new Set();
+
+      this.tours.forEach((tour) => {
+        // Calculate the duration for each tour
+        const duration = this.calculateDuration(tour.startDate, tour.endDate);
+        durations.add(duration);
+
+        // Add the start city (from city) and end city (to city)
+        fromCities.add(tour.city); // Assuming `city` is the start city
+        toCities.add(tour.endCity); // Assuming `endCity` exists in Firestore
+      });
+
+      // Set available options for the dropdowns
+      this.availableDurations = Array.from(durations);
+      this.availableFromCities = Array.from(fromCities);
+      this.availableToCities = Array.from(toCities);
+    },
     updatePageContent() {
-      // Check if we are showing new tours and adjust the title and button visibility
-      if (this.$route.query.new === "true") {
+      // Check if we are in "find ideal tour" mode and adjust the title and button visibility
+      if (this.$route.query.findIdealTour === "true") {
+        this.pageTitle = "Ideal Tours";
+        this.showAllToursButton = true;
+        this.showFilterForm = true; // Show the filter form when in filter mode
+      } else if (this.$route.query.new === "true") {
         this.pageTitle = "New Tours";
         this.showAllToursButton = true;
+        this.showFilterForm = false; // Hide the filter form when showing new tours
       } else {
         this.pageTitle = "Tours"; // Default title
         this.showAllToursButton = false;
+        this.showFilterForm = false; // Hide the filter form by default
       }
     },
+
+    calculateDuration(startDate, endDate) {
+      const start = new Date(startDate.split(".").reverse().join("-"));
+      const end = new Date(endDate.split(".").reverse().join("-"));
+      const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)); // Calculate days between
+      return duration;
+    },
+
     viewTourDetails(id) {
       this.$router.push(`/tours/${id}`); // Navigate to the Tour Details page with the tour ID
     },
@@ -152,5 +264,33 @@ export default {
 .tour-info p {
   font-size: 14px;
   color: #666;
+}
+.filter-form {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  appearance: none;
+}
+
+button {
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #004c99;
 }
 </style>
