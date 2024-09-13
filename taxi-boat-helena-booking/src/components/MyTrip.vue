@@ -70,23 +70,41 @@
           <p>{{ trip.description }}</p>
           <p>Payment Status: {{ trip.paymentStatus }}</p>
         </div>
+        <!-- Write Review Button -->
+        <button @click.stop="openReviewModal(trip.tourId)">
+          Write a Review
+        </button>
       </div>
     </div>
     <p v-else>No past trips</p>
+
+    <!-- Review Modal -->
+    <ReviewModal
+      v-if="isReviewModalOpen"
+      :isOpen="isReviewModalOpen"
+      :tourId="selectedTourId"
+      @close="closeReviewModal"
+    />
   </div>
 </template>
 
 <script>
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../firebase"; // Firebase setup
+import ReviewModal from "./ReviewModal.vue";
 
 export default {
+  components: {
+    ReviewModal,
+  },
   data() {
     return {
       trips: [],
       upcomingTrips: [],
       ongoingTrips: [],
       pastTrips: [],
+      isReviewModalOpen: false, // To control the modal state
+      selectedTourId: null, // To keep track of the selected tour for review
     };
   },
   async mounted() {
@@ -166,8 +184,13 @@ export default {
         }
       }
     },
-    viewTripDetails(tourId) {
-      this.$router.push(`/trip-details/${tourId}`);
+    openReviewModal(tourId) {
+      this.selectedTourId = tourId;
+      this.isReviewModalOpen = true;
+    },
+    closeReviewModal() {
+      this.isReviewModalOpen = false;
+      this.selectedTourId = null;
     },
   },
 };
