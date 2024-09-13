@@ -96,6 +96,7 @@ export default {
         offerings: [],
         newTour: false,
         reviews: [],
+        newTour: true,
       },
       newImageUrl: "",
       newImageTitle: "",
@@ -103,8 +104,15 @@ export default {
     };
   },
   methods: {
+    formatDate(dateStr) {
+      const [year, month, day] = dateStr.split("-");
+      return `${day}.${month}.${year}`;
+    },
     async addTour() {
       try {
+        this.tour.startDate = this.formatDate(this.tour.startDate);
+        this.tour.endDate = this.formatDate(this.tour.endDate);
+
         await addDoc(collection(db, "tours"), this.tour);
         this.$router.push("/tours"); // Redirect to tours page after successful addition
       } catch (error) {
