@@ -61,27 +61,88 @@
 
     <!-- Reserve Button -->
     <div class="divider"></div>
-    <button class="btn-primary">RESERVE THIS TRIP</button>
+    <button
+      v-if="!hasReserved"
+      @click="reserveTrip(tour.tourId)"
+      class="btn-primary"
+    >
+      Reserve This Trip
+    </button>
+    <p v-else>You have already reserved this trip</p>
   </div>
 </template>
 
 <script>
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase"; // Firestore instance
+import { doc, getDoc, arrayUnion, updateDoc } from "firebase/firestore";
+import { db, auth } from "../../firebase"; // Firestore instance
 
 export default {
   name: "TourDetails",
   data() {
     return {
       tour: null,
+      userTrips: [],
     };
   },
+  computed: {
+    hasReserved() {
+      const user = auth.currentUser;
+      if (user && this.userTrips.length > 0 && this.tour?.tourId) {
+        return this.userTrips.some((trip) => trip.tourId === this.tour.tourId);
+      }
+      return false;
+    },
+  },
   methods: {
+    async fetchUserTrips() {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            this.userTrips = userDoc.data().trips || []; // Fetch user's trips
+          }
+        } catch (error) {
+          console.error("Error fetching user trips:", error);
+        }
+      }
+    },
+
+    async reserveTrip(tourId) {
+      if (!tourId) {
+        console.log(tourId);
+        console.error("Invalid tourId, cannot reserve the trip.");
+        return;
+      }
+
+      const user = auth.currentUser; // Get current user
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid); // Reference to the user's document
+
+          // Add tour to the user's trips with payment status 'unpaid'
+          await updateDoc(userRef, {
+            trips: arrayUnion({ tourId, paymentStatus: "unpaid" }),
+          });
+
+          // Redirect to "My Trip" page after reservation
+          this.$router.push("/my-trip");
+        } catch (error) {
+          console.error("Error reserving trip:", error);
+        }
+      } else {
+        console.log("User not logged in.");
+      }
+    },
+
     async fetchTour() {
       const docRef = doc(db, "tours", this.$route.params.id); // Get tour by ID from route
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        this.tour = docSnap.data(); // Set tour data
+        this.tour = {
+          tourId: docSnap.id, // Add the document ID as tourId
+          ...docSnap.data(), // Add the rest of the tour data
+        };
       } else {
         console.error("No such document!");
       }
@@ -105,8 +166,9 @@ export default {
       this.$router.push(`/tours/${this.$route.params.id}/reviews`); // Navigate to the reviews page
     },
   },
-  mounted() {
+  async mounted() {
     this.fetchTour(); // Fetch tour when component is mounted
+    await this.fetchUserTrips();
   },
 };
 </script>
