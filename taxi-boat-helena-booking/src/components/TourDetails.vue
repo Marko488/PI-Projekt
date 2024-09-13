@@ -55,7 +55,7 @@
 
     <!-- Buttons -->
     <div class="buttons-section">
-      <button class="btn-secondary">View Gallery</button>
+      <button class="btn-secondary" @click="viewGallery">View Gallery</button>
       <button class="btn-secondary">View Reviews</button>
     </div>
 
@@ -97,6 +97,9 @@ export default {
       const end = new Date(endDate.split(".").reverse().join("-"));
       const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)); // Calculate days between
       return duration;
+    },
+    viewGallery() {
+      this.$router.push(`/tours/${this.$route.params.id}/gallery`); // Navigate to the gallery
     },
   },
   mounted() {

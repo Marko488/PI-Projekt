@@ -9,6 +9,7 @@ import More from "@/components/More.vue";
 import ContactInformation from "@/components/ContactInformation.vue";
 import Payments from "@/components/Payments.vue";
 import TourDetails from "@/components/TourDetails.vue";
+import TourGallery from "@/components/TourGallery.vue";
 
 const routes = [
   { path: "/", redirect: "/start" },
@@ -22,6 +23,7 @@ const routes = [
   { path: "/contact", component: ContactInformation },
   { path: "/payments", component: Payments },
   { path: "/tours/:id", component: TourDetails },
+  { path: "/tours/:id/gallery", component: TourGallery },
 ];
 
 const router = createRouter({
