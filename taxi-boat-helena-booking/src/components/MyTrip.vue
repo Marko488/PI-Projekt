@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 import { db, auth } from "../../firebase"; // Firebase setup
 import ReviewModal from "./ReviewModal.vue";
 
@@ -157,24 +157,31 @@ export default {
               tourData.endDate.split(".").reverse().join("-")
             );
 
-            if (currentDate < startDate) {
-              this.upcomingTrips.push({
-                ...tourData,
-                tourId: trip.tourId,
-                paymentStatus: trip.paymentStatus,
-              }); // Upcoming trip
-            } else if (currentDate >= startDate && currentDate <= endDate) {
-              this.ongoingTrips.push({
-                ...tourData,
-                tourId: trip.tourId,
-                paymentStatus: trip.paymentStatus,
-              }); // Ongoing trip
-            } else if (currentDate > endDate) {
-              this.pastTrips.push({
-                ...tourData,
-                tourId: trip.tourId,
-                paymentStatus: trip.paymentStatus,
-              }); // Past trip
+            // Check if the trip is unpaid and past or ongoing
+            if (trip.paymentStatus === "unpaid" && currentDate >= startDate) {
+              // If unpaid and ongoing or past, remove from Firestore
+              await this.removeUnpaidTrip(trip.tourId);
+            } else {
+              // Categorize the trips
+              if (currentDate < startDate) {
+                this.upcomingTrips.push({
+                  ...tourData,
+                  tourId: trip.tourId,
+                  paymentStatus: trip.paymentStatus,
+                }); // Upcoming trip
+              } else if (currentDate >= startDate && currentDate <= endDate) {
+                this.ongoingTrips.push({
+                  ...tourData,
+                  tourId: trip.tourId,
+                  paymentStatus: trip.paymentStatus,
+                }); // Ongoing trip
+              } else if (currentDate > endDate) {
+                this.pastTrips.push({
+                  ...tourData,
+                  tourId: trip.tourId,
+                  paymentStatus: trip.paymentStatus,
+                }); // Past trip
+              }
             }
           } else {
             console.error(`No such tour document for tourId: ${trip.tourId}`);
@@ -191,6 +198,22 @@ export default {
     closeReviewModal() {
       this.isReviewModalOpen = false;
       this.selectedTourId = null;
+    },
+    async removeUnpaidTrip(tourId) {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          // Remove the trip from the user's trips array
+          await updateDoc(userRef, {
+            trips: arrayRemove({ tourId: tourId, paymentStatus: "unpaid" }),
+          });
+
+          console.log(`Removed unpaid trip: ${tourId}`);
+        } catch (error) {
+          console.error(`Error removing unpaid trip: ${tourId}`, error);
+        }
+      }
     },
   },
 };
